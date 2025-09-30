@@ -1,0 +1,165 @@
+
+# FHIR Request using old method - direct to FHIR Server
+GET  http://127.0.0.1:8080/csp/healthshare/demo/fhir/r4/Patient/2
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+# FHIR Request using old method - direct to FHIR Server metadata endpoint
+GET  http://127.0.0.1:8080/csp/healthshare/demo/fhir/r4/metadata
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+# FHIR Request to regular FHIR Server metadata using Kong
+GET  http://127.0.0.1:8000/fhir/metadata
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+fhirkey: dRApmSFITncwlfVDV3jDb5koiHIxWpWH
+Prefer: return=representation
+
+###
+
+###
+# FHIR Request to regular FHIR Server Patient using Kong and demo-user2
+GET  http://127.0.0.1:8000/fhir/Patient
+Authorization: Basic ZGVtby11c2VyMjpJU0NERU1P
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+###
+# FHIR Request to regular FHIR Server Patient using Kong and demo-user
+GET  http://127.0.0.1:8000/fhir/Patient
+Authorization: Basic ZGVtby11c2VyOmZoaXJ0ZXN0
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+# FHIR Request to regular FHIR Server using KONG and API Key
+GET  http://127.0.0.1:8000/fhir/Patient
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+apikey: random-demo-key
+Prefer: return=representation
+
+###
+###
+# FHIR Request to regular FHIR Server using KONG and API Key
+GET  http://127.0.0.1:8000/fhir/Patient
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+apikey: random-demo-key
+Prefer: return=representation
+
+###
+# FHIR Request to regular FHIR Server using Baisc Auth only
+GET  http://127.0.0.1:8000/fhir/Patient?_count=1
+Accept: */*
+apikey: random-demo-key
+
+###
+###
+# FHIR Request to regular FHIR Server using KONG and API Key
+GET  http://127.0.0.1:8000/fhir/Patient/2
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+apikey: random-demo-key
+Prefer: return=representation
+
+###
+###
+# FHIR Request to regular FHIR Server using KONG and API Key
+GET  http://127.0.0.1:8000/fhir/Observation/1
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+apikey: random-demo-key
+Prefer: return=representation
+
+###
+## FHIR Request to regular FHIR Server just basic auth
+GET  http://127.0.0.1:8000/fhir/Patient/2
+Authorization: Basic ZGVtby11c2VyMjpJU0NERU1P
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+# FHIR Request to regular FHIR Server using KONG and API Key
+GET  http://127.0.0.1:8000/fhir/Patient/2000
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+apikey: random-demo-key
+Prefer: return=representation
+
+###
+
+###
+# FHIR Request to cohort FHIR Server metadata using Kong
+GET  http://127.0.0.1:8000/cohort/metadata
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+
+###
+# FHIR Request to cohort FHIR Server getting the one Patient using Kong
+GET  http://127.0.0.1:8000/cohort/Patient
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+
+###
+# FHIR Request using new method - limited to GET - going through Kong
+DELETE  http://127.0.0.1:8000/patient/4
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+# FHIR Request using new method - limited to GET - going through Kong using SSL
+GET  https://127.0.0.1:8443/patient?name=Mann
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###

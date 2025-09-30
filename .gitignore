@@ -1,0 +1,12 @@
+*.docx
+*.pdf
+*.pptx
+*.pyc
+fhirclient/lib/python3.10/site-packages/
+__pycache__/
+*.pyi
+*.so
+/__quot*.py
+/__quot*.so
+DS_Store
+test/

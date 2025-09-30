@@ -1,0 +1,507 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  select_tags:
+  - lesson36
+consumers:
+- basicauth_credentials:
+  - password: 1cac519b893058605ed389aba575855718b8bd75
+    tags:
+    - lesson36
+    username: demo-user
+  custom_id: U0010
+  keyauth_credentials:
+  - key: random-demo-key
+    tags:
+    - lesson36
+  tags:
+  - lesson36
+  username: demo-user
+- custom_id: U002
+  keyauth_credentials:
+  - key: random-demo-key-2
+    tags:
+    - lesson36
+  tags:
+  - lesson36
+  username: demo-user2
+plugins:
+- config:
+    anonymous: null
+    hide_credentials: true
+  enabled: false
+  name: basic-auth
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  route: main-fhir
+  service: fhirserver
+  tags:
+  - lesson36
+- config:
+    credentials: false
+    exposed_headers: null
+    headers: null
+    max_age: null
+    methods:
+    - GET
+    - HEAD
+    - PUT
+    - PATCH
+    - POST
+    - DELETE
+    - OPTIONS
+    - TRACE
+    - CONNECT
+    origins: null
+    preflight_continue: false
+    private_network: false
+  enabled: true
+  name: cors
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - lesson36
+- config:
+    content_type: application/json
+    custom_fields_by_lua: {}
+    flush_timeout: null
+    headers:
+      Authorization: Bearer fhirdemotoken
+    http_endpoint: http://host.docker.internal:8082/kong-log
+    keepalive: 60000
+    method: POST
+    queue:
+      initial_retry_delay: 0.01
+      max_batch_size: 20
+      max_bytes: null
+      max_coalescing_delay: 1
+      max_entries: 10000
+      max_retry_delay: 60
+      max_retry_time: 60
+    queue_size: 1000
+    retry_count: null
+    timeout: 10000
+  enabled: true
+  instance_name: iris-fhir
+  name: http-log
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - lesson36
+- config:
+    anonymous: null
+    hide_credentials: false
+    key_in_body: true
+    key_in_header: true
+    key_in_query: true
+    key_names:
+    - apikey
+    run_on_preflight: true
+  enabled: true
+  name: key-auth
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  route: fhir-patient
+  service: fhirserver-patient
+  tags:
+  - lesson36
+- config:
+    anonymous: null
+    hide_credentials: true
+    key_in_body: false
+    key_in_header: true
+    key_in_query: true
+    key_names:
+    - apikey
+    run_on_preflight: true
+  enabled: true
+  name: key-auth
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  route: main-fhir
+  service: fhirserver
+  tags:
+  - lesson36
+- config:
+    access: []
+    body_filter:
+    - |
+      -- Buffer JSON/FHIR bodies safely for later forwarding
+      local chunk, eof = ngx.arg[1], ngx.arg[2]
+      local st = (kong.response.get_status and kong.response.get_status()) or 0
+      if st < 200 or st >= 300 then return end
+      local ct = (kong.response.get_header and kong.response.get_header("content-type")) or ""
+      ct = ct:lower()
+      if not (ct:find("application/fhir+json", 1, true) or ct:find("application/json", 1, true)) then return end
+
+      local buf = kong.ctx.shared.resp_body or ""
+      local MAX = 5 * 1024 * 1024  -- 5 MiB cap
+      if type(chunk) == "string" and #chunk > 0 and #buf < MAX then
+        local need = MAX - #buf
+        buf = buf .. ((#chunk > need) and string.sub(chunk, 1, need) or chunk)
+        kong.ctx.shared.resp_body = buf
+      end
+    certificate: []
+    header_filter: []
+    log:
+    - |-
+      -- Emit the full response body into the serialized log entry
+      local ctx = kong.ctx.plugin
+      if ctx and ctx._resp_chunks then
+        local body = table.concat(ctx._resp_chunks)
+        kong.log.set_serialize_value("response_body", body)  -- raw bytes
+        kong.log.set_serialize_value("debug_body_len", #body)
+      end
+    rewrite: []
+  enabled: true
+  name: pre-function
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  route: main-fhir
+  service: fhirserver
+  tags:
+  - lesson36
+- config:
+    add:
+      body: []
+      headers:
+      - 'Authorization: Basic X1N5c3RlbTpJU0NERU1P'
+      - 'accept: application/fhir+json'
+      - 'accept-encoding: identity'
+      querystring: []
+    append:
+      body: []
+      headers: []
+      querystring: []
+    http_method: null
+    remove:
+      body: []
+      headers: []
+      querystring: []
+    rename:
+      body: []
+      headers: []
+      querystring: []
+    replace:
+      body: []
+      headers: []
+      querystring: []
+      uri: null
+  enabled: true
+  name: request-transformer
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - lesson36
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: iris-fhir
+  name: fhir-cohort
+  path: /csp/healthshare/demo/fhir/r4b
+  port: 52773
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    - PUT
+    - POST
+    - PATCH
+    - DELETE
+    - OPTIONS
+    name: fhir-cohort
+    path_handling: v0
+    paths:
+    - /cohort
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - lesson36
+  tags:
+  - lesson36
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: iris-fhir
+  name: fhirserver
+  path: /csp/healthshare/demo/fhir/r4
+  port: 52773
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    - PUT
+    - POST
+    - PATCH
+    - DELETE
+    - OPTIONS
+    name: main-fhir
+    path_handling: v1
+    paths:
+    - /fhir
+    plugins:
+    - config:
+        content_type: application/json
+        custom_fields_by_lua:
+          debug_body_len: 'return (kong.ctx.shared.resp_body and #kong.ctx.shared.resp_body)
+            or 0'
+          response_body_b64: return ngx.encode_base64(kong.ctx.shared.resp_body or
+            "")
+          response_content_encoding: return kong.response.get_header("Content-Encoding")
+            or ""
+        flush_timeout: null
+        headers:
+          Authorization: Bearer fhirdemotoken
+        http_endpoint: http://host.docker.internal:8082/kong-log
+        keepalive: 60000
+        method: POST
+        queue:
+          initial_retry_delay: 0.01
+          max_batch_size: 1
+          max_bytes: null
+          max_coalescing_delay: 1
+          max_entries: 10000
+          max_retry_delay: 60
+          max_retry_time: 60
+        queue_size: null
+        retry_count: null
+        timeout: 10000
+      enabled: true
+      name: http-log
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - lesson36
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - lesson36
+  tags:
+  - lesson36
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: iris-fhir
+  name: fhirserver-patient
+  path: /csp/healthshare/demo/fhir/r4/Patient
+  port: 52773
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    - OPTIONS
+    name: fhir-patient
+    path_handling: v0
+    paths:
+    - /patient
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - lesson36
+  tags:
+  - lesson36
+  write_timeout: 60000
+upstreams:
+- algorithm: consistent-hashing
+  hash_fallback: none
+  hash_on: path
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 2
+      headers:
+        Accept:
+        - application/fhir+json
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 3
+        successes: 2
+      http_path: /csp/healthshare/demo/fhir/r4b/metadata
+      https_verify_certificate: true
+      timeout: 5
+      type: http
+      unhealthy:
+        http_failures: 5
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 5
+        tcp_failures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 0
+        timeouts: 0
+    threshold: 5
+  name: fhir-cohort
+  slots: 10000
+  tags:
+  - lesson36
+  targets:
+  - target: iris-fhir:52773
+    weight: 100
+  use_srv_name: false
+- algorithm: consistent-hashing
+  hash_fallback: none
+  hash_on: path
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 2
+      headers:
+        Accept:
+        - application/fhir+json
+        Authorization:
+        - Basic X1N5c3RlbTpJU0NERU1P
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 5
+        successes: 2
+      http_path: /csp/healthshare/demo/fhir/r4/metadata
+      https_verify_certificate: true
+      timeout: 5
+      type: http
+      unhealthy:
+        http_failures: 5
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 3
+        tcp_failures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 0
+        timeouts: 0
+    threshold: 5
+  name: iris-fhir
+  slots: 10000
+  tags:
+  - lesson36
+  targets:
+  - target: iris-fhir:52773
+    weight: 100
+  use_srv_name: false

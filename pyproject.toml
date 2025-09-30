@@ -1,0 +1,19 @@
+[project]
+name = "lesson36"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.117.1",
+    "intersystems-irispython",
+    "matplotlib>=3.10.6",
+    "numpy>=2.3.3",
+    "pandas>=2.3.2",
+    "pyodbc>=5.2.0",
+    "python-dotenv>=1.1.1",
+    "uvicorn[standard]>=0.36.0",
+]
+
+[tool.uv.sources]
+intersystems-irispython = { path = "intersystems_irispython-3.2.0-py3-none-any.whl" }

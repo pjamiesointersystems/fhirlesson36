@@ -1,0 +1,305 @@
+###
+# Most basic Kong Request, Kong Admmin Home
+GET  http://127.0.0.1:8001
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+######
+
+# Get a list of services to confirm the FHIR service was added
+GET  http://127.0.0.1:8001/services
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+
+###
+# Add the FHIR Service to Kong
+POST  http://127.0.0.1:8001/services
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+{
+    "name": "fhirserver",
+    "path": "/csp/healthshare/demo/fhir/r4",
+    "host": "iris-fhir",
+    "port": 52773,
+    "retries": 5,
+    "connect_timeout": 60000,
+    "read_timeout": 60000,
+    "write_timeout": 60000
+   
+}
+######
+
+# Get a list of services to confirm the FHIR service was added
+GET  http://127.0.0.1:8001/services
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+# GET the Routes to the FHIR Service
+GET  http://127.0.0.1:8001/services/fhirserver/routes
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+######
+
+###
+# Add the Route to the FHIR Service
+POST  http://127.0.0.1:8001/services/fhirserver/routes
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+{
+  "protocols": [
+    "http",
+    "https"
+  ],
+  "methods": [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "PATCH"
+  ],
+  "paths": [
+    "/fhir"
+  ],
+  "strip_path": true
+}
+
+###
+# GET the Route to the FHIR Service
+GET  http://127.0.0.1:8001/services/fhirserver/routes
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+# Delete a Route to the FHIR Service, you can delete the service
+# before deleting the route
+DELETE  http://127.0.0.1:8001/routes/646ad53f-fce7-4504-ad32-7606ec289c63
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+######
+
+###
+# Delete a Route to the FHIRSQL Builder Service, you can delete the service
+# before deleting the route
+DELETE  http://127.0.0.1:8001/routes/6d421d04-ed4b-4879-ba5f-a4f812d76ab9
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+######
+
+######
+# Delete a specific service - in this case the FHIR service
+DELETE   http://127.0.0.1:8001/services/
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+
+######
+# Get all the Kong routes
+GET  http://127.0.0.1:8001/routes
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+#########
+# Delete specific Kong routes
+
+
+######
+# Get the main-fhir route
+GET  http://127.0.0.1:8001/routes/main-fhir
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+#########
+DELETE  http://127.0.0.1:8001/routes/50fd6c8c-1df1-46a9-b584-1fbdc3dd9d91?serviceId=f4ce5065-ec97-4ad8-a55d-aa23459dd333
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+# Add a most specific FHIR Service to Kong (Just Patient)
+POST  http://127.0.0.1:8001/services
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+{
+    "name": "fhirserver-patient",
+    "path": "/csp/healthshare/demo/fhir/r4/Patient",
+    "host": "iris-fhir",
+    "port": 52773,
+    "retries": 5,
+    "connect_timeout": 60000,
+    "read_timeout": 60000,
+    "write_timeout": 60000
+   
+}
+
+######
+# Add a Route to the FHIR Patient Service - limited to GET only
+###
+POST http://127.0.0.1:8001/services/fhirserver-patient/routes
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json, charset=utf-8
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+{
+  "protocols": [
+    "http",
+    "https"
+  ],
+  "methods": [
+    "GET"
+  ],
+  "paths": [
+    "/Patient"
+  ],
+  "strip_path": true
+}
+###
+# Chek to make sure the fhirserver-patient service is on list of services to confirm the FHIR service was added
+GET  http://127.0.0.1:8001/services
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+# Check to the that the Route to the fhirserver-patient service is correct
+GET  http://127.0.0.1:8001/services/fhirserver-patient/routes
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+
+GET  http://127.0.0.1:8001/upstreams/iris-fhir/health
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+#####
+
+######
+# Get a list of all upstreams
+GET  http://127.0.0.1:8001/upstreams
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+#####
+
+
+######
+# Get the status of an specific upstream iris-fhir
+GET  http://127.0.0.1:8001/upstreams/iris-fhir/health
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+#####
+
+######
+# Get the status of an specific upstream iris-cohort-up
+GET  http://127.0.0.1:8001/upstreams/fhir-cohort/health
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+#####
+######
+# Create a second upstream to the cohort service
+POST  http://127.0.0.1:8001/upstreams
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+{
+  "name": "iris-cohort-up",
+  "hash_on": "none",
+  "healthchecks": {
+    "active": {
+      "type": "http",
+      "http_path": "/csp/healthshare/demo/fhir/r4b/metadata",
+      "timeout": 5,
+      "concurrency": 2,
+      "headers": {
+        "Accept": ["application/fhir+json"]
+      },
+      "healthy": {
+        "interval": 10,
+        "successes": 2,
+        "http_statuses": [200, 302]
+      },
+      "unhealthy": {
+        "interval": 10,
+        "http_failures": 3,
+        "timeouts": 2,
+        "tcp_failures": 1,
+        "http_statuses": [429, 500, 502, 503, 504, 505]
+      }
+    }
+  }
+}
+#####
+# Check the upstream status is healthy
+GET  http://127.0.0.1:8001/consumers/patient-reader/hmac-auth
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+#####
